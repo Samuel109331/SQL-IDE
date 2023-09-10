@@ -1,0 +1,43 @@
+{% extends "home.html" %}
+{% block title %}
+Mysql database
+{% endblock %}
+{% block content %}
+<form action="/saveinfo" method="post">
+    <div class="form-container">
+        <input type="hidden" name="ww">
+    </div>
+    <div class="form-container">
+        <label>Host server </label>
+        <input type="text" name="host" placeholder="example:- 127.0.0.1:5000" autocomplete="off" required>
+    </div>
+    <div class="form-container">
+        <label>Mysql user name</label>
+        <input type="text" name="user" placeholder="example:- root" autocomplete="off" required>
+    </div>
+    <div class="form-container">
+        <label>Database name</label>
+        <input type="text" name="database" placeholder="sql db name" autocomplete="off" required>
+    </div>
+    <div class="form-container">
+        <label>Mysql password</label>
+        <input type="password" name="pass" placeholder="......" autocomplete="off" required>
+    </div>
+    <div class="form-container">
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+    </div>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+    <div class="popup">
+        <button onclick="document.querySelector('.popup').style.display='none'"><i class="fa fa-close" style="font-size:48px;color:red"></i></button>
+            <p>{{ message }}</p>
+        {% endfor %}        
+    {% endif %}
+    {% endwith %}           
+            
+        
+    </div>
+</form>
+{% endblock %}

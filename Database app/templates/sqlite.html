@@ -1,0 +1,16 @@
+{% extends "home.html" %}
+{% block title %}
+Sqlite3 Database
+{% endblock %}
+{% block content %}
+<form action="/confirm" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+    <div class="form-container">
+        <p>Upload sqlite3 database (.db) extension </p>
+        <input type="file" name="db" accept=".db" required>
+    </div>
+    <div class="form-container">
+        <button type="submit">Upload</button>
+        <button type="reset">Reset</button>
+    </div>
+</form>
+{% endblock %}

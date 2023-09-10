@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        @font-face {
+            font-family: 'CustomFont'; 
+            src: url('/static/grand-theft-auto/pricedow.ttf');   
+            
+        }
+        body {
+            background-color: #302727;
+            color: #FFF;
+        }
+        .database-info {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            font-size: 25px;
+            
+        }
+        .form-container {
+            display: flex;
+            margin: 1%;
+            width: 100%;
+            justify-content: center;
+        }
+       .result {
+            display: flex;
+            margin: 1%;
+            width: 100%;
+            justify-content: center;
+       }
+        .form-container:nth-of-type(3) {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+        }
+    </style>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/static/dblogo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MySQL database IDE</title>
+</head>
+<body>
+    <div class="database-info">
+        <p>This database have {{ tables | length }} tables in total!</p>
+    </div>
+    <div class="query">
+        <div class="form-container">
+            <label>Choose tables from the database</label>
+            <select  id="tables" onchange="toggleattr()">
+                {% for i in tables %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-container">
+            <label>Choose table attributes</label>
+            <select  id="table-attrs">
+                   <!-- <option value="">Attribute</option> -->
+            </select>
+        </div>
+
+        <div class="form-container">
+        <p>Enter a sql command here</p>
+        <textarea  id="query" cols="30" rows="10" placeholder="Enter sql command here..." ></textarea>
+        <button style="border: none;padding:5px;font-size:18px;margin:4% 0 0 0;background:deepskyblue;color:#FFF;font-weight:bolder;cursor:pointer" onclick="runSQL()">Execute</button>
+        </div>
+        <div class="result">
+            <p>Result goes here...</p>
+        </div>
+    </div>
+    <script>
+        function runSQL() {
+            const query = document.querySelector("#query");
+            const output = document.querySelector(".result");
+            // Define the URL of your Flask API endpoint
+        const apiUrl = '/runmysql';
+
+        // Sample query data
+        const queryData = {
+            query: query.value
+        };
+
+        // Fetch data using the Fetch API
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(queryData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const outputDiv = document.getElementById('output');
+            if (data.error) {
+                output.innerHTML = `<p style='color:red;'>Error: ${data.error}</p>`;
+            } else {
+                // Assuming 'outputs' is an array of results
+                const outputs = data.outputs;
+                let outputHTML = '<table border="1">';
+                    for (let i=0; i < outputs.length;i++) {
+                        outputHTML += `<tr><td>${outputs[i]}</td></tr>`
+                        for (let j = 0; j < i.length; j++) {
+                            outputHTML += `<tr><td>${j[i]}</td></tr>`
+                        }
+                    }
+                    outputHTML += '</table>';
+                    output.innerHTML = outputHTML;
+            }
+        })
+        }
+        function toggleattr() {
+            fetch("/getmysqlattr/"+document.querySelector("#tables").value)
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                attrs = data.attributes;
+                document.querySelector("#table-attrs").innerHTML = "";
+                for (let i of attrs) {
+                document.querySelector("#table-attrs").innerHTML += `
+                <option value=${i}>${i}</option>
+                `
+                }
+            })
+        }
+        var options = document.querySelectorAll("option");
+
+        options.forEach(el => {
+            el.addEventListener("click", function () {
+                document.querySelector("#query").value += this.value;
+                alert(this)
+            })
+        })
+
+        toggleattr();
+    </script>
+</body>
+</html>
